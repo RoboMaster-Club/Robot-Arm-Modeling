@@ -27,3 +27,10 @@
 **2.** https://robotics.caltech.edu/~jwb/courses/ME115/handouts/damped.pdf (for damped jacobian pseudo inverse for IK)
 
 Good Luck 👍
+
+
+### Addendum 
+
+**Denavit-Hartenberg Parameters**: https://youtu.be/rA9tm0gTln8?si=4x_G1ldNQupkrWpk
+
+**The Paper**: https://www.researchgate.net/publication/360442615_Forward_Inverse_Kinematics_Solution_of_6-DOF_Robots_Those_Have_Offset_Spherical_Wrists

@@ -10,8 +10,8 @@ def dh_params(theta1, theta2, theta3, theta4, theta5, theta6):
     # Adjust these parameters for your specific robot arm
     return np.array([
         [0, np.pi/2, 0.1, theta1],           # Joint 1 (base rotation)
-        [0.2, 0, 0, theta2 + np.pi/2],       # Joint 2 (shoulder)
-        [0.2, 0, 0, theta3],                 # Joint 3 (elbow)
+        [0.3, 0, 0, theta2 + np.pi/2],       # Joint 2 (shoulder)
+        [0.3, 0, 0, theta3],                 # Joint 3 (elbow)
         [0, np.pi/2, 0.1, theta4],           # Joint 4 (wrist 1)
         [0, -np.pi/2, 0.1, theta5],          # Joint 5 (wrist 2)
         [0, 0, 0.1, theta6]                  # Joint 6 (wrist 3)
@@ -31,12 +31,12 @@ def forward_kinematics(dh_params):
     # Initialize with identity matrix
     T = np.identity(4)
     transforms = [T.copy()]
-    
+
     for i in range(len(dh_params)):
         a, alpha, d, theta = dh_params[i]
         T = T @ dh_transform(a, alpha, d, theta)
         transforms.append(T.copy())
-    
+
     return transforms
 
 # Extract joint positions from transformation matrices
@@ -104,37 +104,37 @@ def update_plot(val=None):
     theta4 = slider4.val
     theta5 = slider5.val
     theta6 = slider6.val
-    
+
     # Calculate forward kinematics
     dh = dh_params(theta1, theta2, theta3, theta4, theta5, theta6)
     transforms = forward_kinematics(dh)
-    
+
     # Extract joint positions
     positions = get_joint_positions(transforms)
-    
+
     # Update arm line plot
     arm_points.set_data(positions[:, 0], positions[:, 1])
     arm_points.set_3d_properties(positions[:, 2])
-    
+
     # Update end effector position
     end_effector._offsets3d = ([positions[-1, 0]], [positions[-1, 1]], [positions[-1, 2]])
-    
+
     # Update coordinate frames
     for i in range(len(transforms)):
         T = transforms[i]
         pos = T[0:3, 3]
-        
+
         # Draw each axis (x, y, z) with a different color
         for j in range(3):
             axis = np.zeros(3)
             axis[j] = 0.1  # Axis length
             axis_end = pos + T[0:3, j] * axis[j]
-            
+
             idx = i * 3 + j
             if idx < len(coord_frame_lines):
                 coord_frame_lines[idx].set_data([pos[0], axis_end[0]], [pos[1], axis_end[1]])
                 coord_frame_lines[idx].set_3d_properties([pos[2], axis_end[2]])
-    
+
     fig.canvas.draw_idle()
 
 # Connect sliders to update function
