@@ -125,7 +125,7 @@ Mat* mat_sub(Mat* m1, Mat* m2) {
 
 
 void mat_sub_buffer(Mat* m1, Mat* m2, Mat* diff) {
-    assert(m1->rows == m2->rows && m1->cols == m2->cols && sum->rows == m1->rows && sum->cols == m1->cols);
+    assert(m1->rows == m2->rows && m1->cols == m2->cols && diff->rows == m1->rows && diff->cols == m1->cols);
     for (int i = 0; i < m1->rows; i++) {
         for (int j = 0; j < m1->cols; j++) {
             MAT_IDX(diff, i, j) = MAT_IDX(m1, i, j) - MAT_IDX(m2, i, j);
