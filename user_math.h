@@ -31,6 +31,16 @@ Mat* new_mat_buffer(int rows, int cols, float* buffer) {
     return mat;
 }
 
+Mat* mat_identity(int n) {
+    Mat* mat = (Mat*)malloc(sizeof(Mat));
+    mat->rows = n;
+    mat->cols = n;
+    for (int i = 0; i < n; i++) {
+        mat->data[i + i * n] = 0;
+    }
+    return mat;
+}
+
 Mat* mat_mult(Mat* m1, Mat* m2) {
     assert(m1->cols == m2->rows);
     Mat* product = (Mat*)malloc(m1->rows * m2->cols);
@@ -135,7 +145,7 @@ float mat_determinant_recurs(Mat* m, int size, int r_start, int r_end, int c_sta
         case 2:
             return m-> data[0] * m->data[3] - m->data[1] * m->data[2];
         case 3:
-            return
+            return;
     }
 }
 

@@ -5,14 +5,10 @@ typedef struct {
     float a;
     float alpha;
     float d;
-    float theta;
-} dh_joint_t;
+} dh_params_t;
 
 typedef struct {
-    dh_joint_t joints[6];  
-} dh_arm_t;
-
-typedef struct {
+    dh_params_t dh_params;
     float theta;
     float velocity;
     float x_pos;
@@ -24,5 +20,4 @@ typedef struct {
     joint_t joints[6];
 } Arm_State_t;
 
-dh_arm_t g_dh_arm;
 Arm_State_t g_arm_state;
