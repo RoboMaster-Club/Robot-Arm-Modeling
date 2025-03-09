@@ -1,8 +1,6 @@
 #include "user_math.h"
-#include <assert.h>
 
 // #define assert(cond) if (!(cond)) { printf("Assertion failed: %s\n", #cond); exit(1); }
-#define MAT_IDX(m, i, j) ((m)->data[(i) * (m)->cols + (j)])
 
 Mat* new_mat(int rows, int cols) {
     Mat* mat = (Mat*)malloc(sizeof(Mat));
@@ -36,6 +34,11 @@ Mat* new_mat_buffer(int rows, int cols, float* buffer) {
         }
     }
     return mat;
+}
+
+void free_mat(Mat* m) {
+    free(m->data);
+    free(m);
 }
 
 Mat* mat_mult(Mat* m1, Mat* m2) {
@@ -133,19 +136,71 @@ void mat_sub_buffer(Mat* m1, Mat* m2, Mat* diff) {
     }
 }
 
+/**
+ * Calculate the determinant of the matrix recursively. DO NOT CALL THIS FUNCTION DIRECTLY.
+ * 
+ * @param m The matrix to calculate the determinant of.
+ * @param size The size of the matrix determinant. Must be at least 2.
+ * @param r_start The starting row index of the submatrix.
+ * @param r_end The ending row index of the submatrix.
+ * @param c_start The starting column index of the submatrix.
+ * @param c_end The ending column index of the submatrix.
+ * @param i The row index of the element in the submatrix to calculate the determinant of.
+ * @param j The column index of the element int the submatrix to calculate the determinant of.
+ * 
+ * @return The determinant of the submatrix.
+ * 
+ * Example:
+ * 
+ * if m = |  1  2  3  4 |
+ *        |  5  6  7  8 |
+ *        |  9 -1 -2 -3 |
+ *        | -4 -5 -6 -7 |
+ * 
+ * And you want to take the determinant of the 3x3 submatrix from i=1, j=1 to i=3, j=3 for element 6 (so i=0, j=0 relative to the submatrix):
+ * you would call: mat_determinant_recurs(m, 3, 1, 3, 1, 3, 0, 0)
+ * 
+ * Here, the submatrix would be:
+ * |  6  7  8 |
+ * | -1 -2 -3 |
+ * | -5 -6 -7 |
+ * 
+ * So the size is 2, r_start = 1, r_end = 3, c_start = 1, c_end = 3, i = 0, j = 0
+ */
 float mat_determinant_recurs(Mat* m, int size, int r_start, int r_end, int c_start, int c_end, int i, int j) {
     assert(m->rows == m->cols && size >= 2);
+    assert(r_start >= 0 && r_end < m->rows && c_start >= 0 && c_end < m->cols);
+    assert(size == r_end - r_start && size == c_end - c_start);
+    assert(i >= 0 && i <= size && j >= 0 && j <= size);
     // TODO Add assertions
     float det = 0;
     switch(size) {
         case 2:
-            return m->data[r_start * m->cols + c_start] * m->data[r_end * m->cols + c_end] 
-            - m->data[r_start * m->cols + c_end] * m->data[r_end * m->cols + c_start];
-        case 3:
-            return
+            return MAT_IDX(m, r_start + (i?0:1), c_start + (j?0:1)) * MAT_IDX(m, r_end - (size-i?0:1), c_end - (size-j?0:1))
+            - MAT_IDX(m, r_start + (i?0:1), c_end - (size-j?0:1)) * MAT_IDX(m, r_end - (size-i?0:1), c_start + (j?0:1));
+        default:
+            for (int k = 0; k < size; k++) {
+                det += (1 - 2 * ((i + j) % 2)) * MAT_IDX(m, r_start + i, c_start + j) * mat_determinant_recurs(m, size - 1, r_start, r_end, c_start, c_end, i, j);
+            }
+            return det;
     }
 }
 
+/**
+ * Calculate the determinant of the matrix.
+ * 
+ * @param m The matrix to calculate the determinant of.
+ * 
+ * @return The determinant of the matrix.
+ * 
+ * Example:
+ * 
+ * if m = |1 2 3|
+ *        |4 5 6|
+ *        |7 8 9|
+ * 
+ * You would call: mat_determinant(m)
+ */
 float mat_determinant(Mat* m) {
     assert (m->rows == m->cols);
     float det = 0;
@@ -161,11 +216,10 @@ float mat_determinant(Mat* m) {
             }
             return det;
         default:
-            for (int i = 0; i < m-> rows; i++) {
-                for (int j = 0; j < m->cols; j++) {
-                    
-                }
+            for (int i = 0; i < m->rows; i++) {
+                det += (1 - 2 * (i % 2)) * m->data[i] * mat_determinant_recurs(m, m->rows - 1, 0, m->rows - 1, 0, m->rows - 1, i, 0);
             }
+            return det;
     }
 }
 
@@ -196,6 +250,7 @@ Mat* mat_adjoint(Mat* m) {
 }
 
 float mat_cofactor(Mat *m, int i, int j) {
-    assert(m->rows == m->cols && i < m->rows && j < m->cols)
-    float cofac = (1 - 2 * ((i * j) % 2)) * mat_determinant_recurs(m, i, j)
+    assert(m->rows == m->cols);
+    assert(i < m->rows && j < m->cols);
+    float cofac = (1 - 2 * ((i * j) % 2)) * mat_determinant_recurs(m, m->rows, 0, m->rows, 0, m->cols, i, j);
 }
