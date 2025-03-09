@@ -125,6 +125,20 @@ void mat_sub_buffer(Mat* m1, Mat* m2, Mat* sum) {
     }
 }
 
+float mat_determinant_recurs(Mat* m, int size, int r_start, int r_end, int c_start, int c_end, int i, int j) {
+    assert(m->rows == m->cols);
+    // TODO Add assertions
+    float det = 0;
+    switch(m->rows) {
+        case 1: 
+            return m-> data[0];
+        case 2:
+            return m-> data[0] * m->data[3] - m->data[1] * m->data[2];
+        case 3:
+            return
+    }
+}
+
 float mat_determinant(Mat* m) {
     assert (m->rows == m->cols);
     float det = 0;
@@ -160,3 +174,24 @@ Mat* mat_inverse(Mat* m) {
     free_mat(adj);
     return inverse;
 }
+
+Mat* mat_adjoint(Mat* m) {
+    assert(m->rows == m->cols);
+    Mat* adj = (Mat*)malloc(m->rows * m->cols);
+    adj->rows = m->rows;
+    adj->cols = m->cols;
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            adj->data[i * adj->cols + j] = mat_cofactor(m, i, j);
+        }
+    }
+    return adj;
+}
+
+float mat_cofactor(Mat *m, int i, int j) {
+    assert(m->rows == m->cols && i < m->rows && j < m->cols)
+    float cofac = (1 - 2 * ((i * j) % 2)) * mat_determinant_recurs(m, )
+}
+
+// ADD TRANSPOSE, PSEUDO INVERSE, COFACTOR from determinant and adjoint as transpose
+

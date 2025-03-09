@@ -1,31 +1,28 @@
 #include <stdio.h>
 #include <math.h>
 
-#define PI (3.141592f)
-
-float g_theta0 = 0;
-float g_theta1 = 0;
-float g_theta2 = 0;
-float g_theta3 = 0;
-float g_theta4 = 0;
-float g_theta5 = 0;
-
-typedef struct joint {
+typedef struct {
     float a;
     float alpha;
     float d;
     float theta;
+} dh_joint_t;
+
+typedef struct {
+    dh_joint_t joints[6];  
+} dh_arm_t;
+
+typedef struct {
+    float theta;
+    float velocity;
+    float x_pos;
+    float y_pos;
+    float z_pos;
 } joint_t;
 
-typedef struct arm {
-    joint_t joints[6];  
-} arm_t;
+typedef struct {
+    joint_t joints[6];
+} Arm_State_t;
 
-// [a, alpha, d, theta]
-arm_t g_arm = {{{0, M_PI / 2, 0.1, 0},
-                 {0.3, 0, 0, M_PI / 2},
-                 {0.3, 0, 0, 0},
-                 {0, M_PI /2, 0.1, 0},
-                 {0, -1 * M_PI /2, 0.1, 0},
-                 {0, 0, 0.1, 0}}
-};
+dh_arm_t g_dh_arm;
+Arm_State_t g_arm_state;
