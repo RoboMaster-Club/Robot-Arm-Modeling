@@ -30,13 +30,11 @@ def dh_transform(a, alpha, d, theta):
 def forward_kinematics(dh_params):
     # Initialize with identity matrix
     T = np.identity(4)
-    transforms = [T.copy()]
-
+    transforms = []
     for i in range(len(dh_params)):
         a, alpha, d, theta = dh_params[i]
         T = T @ dh_transform(a, alpha, d, theta)
         transforms.append(T.copy())
-
     return transforms
 
 # Extract joint positions from transformation matrices
