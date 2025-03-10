@@ -285,7 +285,7 @@ float mat_determinant(Mat* m) {
             }
             return det;
         default:
-            // Submatrix for cofactor
+            // submatrix for cofactor
             Mat* temp = new_mat(m->rows-1, m->cols-1); 
             for (int j = 0; j < m->cols; j++) {
                 float sign = (j % 2 == 0) ? 1.0f : -1.0f;

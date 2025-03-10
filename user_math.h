@@ -56,6 +56,7 @@ Mat* mat_transpose(Mat *m);
 Mat* mat_transpose_buffer(Mat *m, Mat* buffer);
 Mat* mat_transpose_overwrite(Mat *m);
 
+// TODO: ADD PSEUDO INVERSE
 
-// ADD TRANSPOSE, PSEUDO INVERSE, COFACTOR from determinant and adjoint as transpose
+// TODO: If I feel like it: LU DECOMPOSITION, QR DECOMPOSITION, SVD DECOMPOSITION, EIGEN DECOMPOSITION, SOLVE LINEAR SYSTEM, SOLVE EIGENVALUE PROBLEM, SOLVE EIGENVECTOR PROBLEM, SOLVE SVD PROBLEM
 

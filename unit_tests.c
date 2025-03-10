@@ -221,6 +221,28 @@ void test_matrix_inverse() {
     free_mat(m);
     free_mat(result);
     free_mat(expected);
+
+    float data2[] = {
+        1, 2, 3, 4, 
+        5, 6, 2, 4, 
+        0, 1, 11, 3, 
+        3, 1, 0, 1};
+    float expected_data2[] = {
+        -0.08441558, -0.05194805,  0.03246753,  0.44805195, 
+        -0.19155844, 0.30519481, -0.00324675, -0.44480519, 
+        -0.1038961 ,  0.01298701, 0.11688312,  0.01298701,  
+        0.44480519, -0.14935065, -0.09415584, 0.10064935};
+
+    Mat* m2 = new_mat_buffer(4, 4, data2);
+    Mat* result2 = mat_inverse(m2);
+    Mat* expected2 = new_mat_buffer(4, 4, expected_data2);
+
+    assert_matrix_equal(result2, expected2, 1e-6);
+
+    free_mat(m2);
+    free_mat(result2);
+    free_mat(expected2);
+    
     test_count++;
 }
 
