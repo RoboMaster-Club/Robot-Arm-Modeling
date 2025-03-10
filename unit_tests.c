@@ -188,42 +188,41 @@ void test_determinant_4x4() {
 }
 
 
-// // MATRIX TRANSPOSE TESTS
+// MATRIX TRANSPOSE TESTS
 
-// void test_matrix_inverse() {
-//     float data[] = {4, 7, 2, 6};
-//     float expected_data[] = {0.6, -0.7, -0.2, 0.4};  // Inverse of 2x2 matrix
+void test_matrix_transpose() {
+    float data[] = {1, 2, 3, 4, 5, 6};
+    float expected_data[] = {1, 4, 2, 5, 3, 6};
 
-//     Mat* m = new_mat_buffer(2, 2, data);
-//     Mat* result = mat_inverse(m);
-//     Mat* expected = new_mat_buffer(2, 2, expected_data);
+    Mat* m = new_mat_buffer(2, 3, data);
+    Mat* result = mat_transpose(m);
+    Mat* expected = new_mat_buffer(3, 2, expected_data);
 
-//     assert_matrix_equal(result, expected, 1e-6);
+    assert_matrix_equal(result, expected, 1e-6);
 
-//     free_mat(m);
-//     free_mat(result);
-//     free_mat(expected);
-//     test_count++;
-// }
+    free_mat(m);
+    free_mat(result);
+    free_mat(expected);
+    test_count++;
+}
 
+// MATRIX INVERSE TESTS
 
-// // MATRIX INVERSE TESTS
+void test_matrix_inverse() {
+    float data[] = {4, 7, 2, 6};
+    float expected_data[] = {0.6, -0.7, -0.2, 0.4};  // Inverse of 2x2 matrix
 
-// void test_matrix_transpose() {
-//     float data[] = {1, 2, 3, 4, 5, 6};
-//     float expected_data[] = {1, 4, 2, 5, 3, 6};
+    Mat* m = new_mat_buffer(2, 2, data);
+    Mat* result = mat_inverse(m);
+    Mat* expected = new_mat_buffer(2, 2, expected_data);
 
-//     Mat* m = new_mat_buffer(2, 3, data);
-//     Mat* result = mat_transpose(m);
-//     Mat* expected = new_mat_buffer(3, 2, expected_data);
+    assert_matrix_equal(result, expected, 1e-6);
 
-//     assert_matrix_equal(result, expected, 1e-6);
-
-//     free_mat(m);
-//     free_mat(result);
-//     free_mat(expected);
-//     test_count++;
-// }
+    free_mat(m);
+    free_mat(result);
+    free_mat(expected);
+    test_count++;
+}
 
 // MAIN
 
@@ -256,11 +255,15 @@ int main() {
 
     // Run Transpose Tests
 
-    // test_matrix_transpose();
+    test_matrix_transpose();
+
+    printf("All transpose tests passed!\n");
 
     // Run Inverse Tests
 
-    // test_matrix_inverse();
+    test_matrix_inverse();
+
+    printf("All inverse tests passed!\n");
 
     printf("Total tests passed: %d\n", test_count);
     return 0;

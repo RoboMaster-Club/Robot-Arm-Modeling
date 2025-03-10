@@ -235,6 +235,14 @@ Mat* mat_transpose_buffer(Mat* m, Mat* buffer) {
     return buffer;
 }
 
+/**
+ * Transpose the matrix in place. 
+ * NOTE: THIS FUNCTION ONLY WORKS FOR SQUARE MATRICES.
+ * 
+ * @param m The matrix to transpose (will be overwritten).
+ * 
+ * @return The transposed matrix.
+ */
 Mat* mat_transpose_overwrite(Mat* m) {
     float temp;
     for (int i = 0; i < m->rows; i++) {
@@ -277,7 +285,8 @@ float mat_determinant(Mat* m) {
             }
             return det;
         default:
-            Mat* temp = new_mat(m->rows-1, m->cols-1); // Submatrix for cofactor
+            // Submatrix for cofactor
+            Mat* temp = new_mat(m->rows-1, m->cols-1); 
             for (int j = 0; j < m->cols; j++) {
                 float sign = (j % 2 == 0) ? 1.0f : -1.0f;
                 
@@ -315,7 +324,7 @@ float mat_cofactor(Mat *m, int i, int j) {
         sub_i++;
     }
 
-    float cofactor = powf(-1, i + j) * mat_determinant(submat);
+    float cofactor = (1 - 2 * ((i + j) % 2)) * mat_determinant(submat);
     free_mat(submat);
     return cofactor;
 }
