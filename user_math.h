@@ -53,7 +53,8 @@ Mat* mat_cofactor_matrix_buffer(Mat* m, Mat* buffer);
 Mat* mat_inverse(Mat* m);
 Mat* mat_inverse_buffer(Mat* m, Mat* buffer);
 Mat* mat_transpose(Mat *m);
-Mat* mat_transpose_buffer(Mat *m);
+Mat* mat_transpose_buffer(Mat *m, Mat* buffer);
+Mat* mat_transpose_overwrite(Mat *m);
 
 
 // ADD TRANSPOSE, PSEUDO INVERSE, COFACTOR from determinant and adjoint as transpose

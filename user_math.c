@@ -215,6 +215,38 @@ SECTION:	Advanced Matrix Operations
 -------------------------------------------------------------
 */
 
+Mat* mat_transpose(Mat* m) {
+    Mat* transposed = new_mat(m->cols, m->rows);
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            MAT_IDX(transposed, j, i) = MAT_IDX(m, i, j);
+        }
+    }
+    return transposed;
+}
+
+Mat* mat_transpose_buffer(Mat* m, Mat* buffer) {
+    assert(m->rows == buffer->cols && m->cols == buffer->rows);
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            MAT_IDX(buffer, j, i) = MAT_IDX(m, i, j);
+        }
+    }
+    return buffer;
+}
+
+Mat* mat_transpose_overwrite(Mat* m) {
+    float temp;
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = i + 1; j < m->cols; j++) {
+            temp = MAT_IDX(m, i, j);
+            MAT_IDX(m, i, j) = MAT_IDX(m, j, i);
+            MAT_IDX(m, j, i) = temp;
+        }
+    }
+    return m;
+}
+
 /**
  * Calculate the determinant of the matrix.
  * 
@@ -266,34 +298,91 @@ float mat_determinant(Mat* m) {
     }
 }
 
-// Mat* mat_inverse(Mat* m) {
-//     assert(m->rows == m->cols);
-//     Mat* inverse = (Mat*)malloc(m->rows * m->cols);
-//     inverse->rows = m->rows;
-//     inverse->cols = m->cols;
-//     float det = mat_determinant(m);
-//     assert(det != 0);
-//     Mat* adj = mat_adjoint(m);
-//     mat_scalar_mult_buffer(adj, 1 / det, inverse);
-//     free_mat(adj);
-//     return inverse;
-// }
+float mat_cofactor(Mat *m, int i, int j) {
+    assert(m->rows == m->cols);
 
-// Mat* mat_adjoint(Mat* m) {
-//     assert(m->rows == m->cols);
-//     Mat* adj = (Mat*)malloc(m->rows * m->cols);
-//     adj->rows = m->rows;
-//     adj->cols = m->cols;
-//     for (int i = 0; i < m->rows; i++) {
-//         for (int j = 0; j < m->cols; j++) {
-//             adj->data[i * adj->cols + j] = mat_cofactor(m, i, j);
-//         }
-//     }
-//     return adj;
-// }
+    Mat* submat = new_mat(m->rows - 1, m->cols - 1);
+    int sub_i = 0, sub_j = 0;
 
-// float mat_cofactor(Mat *m, int i, int j) {
-//     assert(m->rows == m->cols);
-//     assert(i < m->rows && j < m->cols);
-//     float cofac = (1 - 2 * ((i * j) % 2)) * mat_determinant_recurs(m, m->rows, 0, m->rows, 0, m->cols, i, j);
-// }
+    for (int row = 0; row < m->rows; row++) {
+        if (row == i) continue;
+        sub_j = 0;
+        for (int col = 0; col < m->cols; col++) {
+            if (col == j) continue;
+            MAT_IDX(submat, sub_i, sub_j) = MAT_IDX(m, row, col);
+            sub_j++;
+        }
+        sub_i++;
+    }
+
+    float cofactor = powf(-1, i + j) * mat_determinant(submat);
+    free_mat(submat);
+    return cofactor;
+}
+
+Mat* mat_cofactor_matrix(Mat* m) {
+    Mat* cofactor_mat = new_mat(m->rows, m->cols);
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            MAT_IDX(cofactor_mat, i, j) = mat_cofactor(m, i, j);
+        }
+    }
+    return cofactor_mat;
+}
+
+Mat* mat_cofactor_matrix_buffer(Mat* m, Mat* buffer) {
+    assert(m->rows == buffer->rows && m->cols == buffer->cols);
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            MAT_IDX(buffer, i, j) = mat_cofactor(m, i, j);
+        }
+    }
+    return buffer;
+}
+
+Mat* mat_adjoint(Mat* m) {
+    Mat* cofactor_mat = mat_cofactor_matrix(m);
+    Mat* adjoint_mat = mat_transpose_overwrite(cofactor_mat);
+    return adjoint_mat;
+}
+
+Mat* mat_adjoint_buffer(Mat* m, Mat* buffer) {
+    mat_cofactor_matrix_buffer(m, buffer);
+    return mat_transpose_overwrite(buffer);
+}
+
+Mat* mat_inverse(Mat* m) {
+    assert(m->rows == m->cols);
+
+    Mat* cofactor_mat = new_mat(m->rows, m->cols);
+
+    mat_cofactor_matrix_buffer(m, cofactor_mat);
+    float det = 0.0f;
+    for (int j = 0; j < m->cols; j++) {
+        det += MAT_IDX(m, 0, j) * MAT_IDX(cofactor_mat, 0, j);
+    }
+
+    assert(det != 0); // make sure matrix is invertible
+
+    mat_transpose_overwrite(cofactor_mat);
+    mat_scalar_mult_buffer(cofactor_mat, 1.0f / det, cofactor_mat);
+    return cofactor_mat;
+}
+
+Mat* mat_inverse_buffer(Mat* m, Mat* buffer) {
+    assert(m->rows == m->cols);
+    assert(buffer->rows == m->rows && buffer->cols == m->cols);
+
+    mat_cofactor_matrix_buffer(m, buffer);
+
+    float det = 0.0f;
+    for (int j = 0; j < m->cols; j++) {
+        det += MAT_IDX(m, 0, j) * MAT_IDX(buffer, 0, j);
+    }
+
+    assert(det != 0); // make sure matrix is invertible
+    
+    mat_transpose_overwrite(buffer);
+    mat_scalar_mult_buffer(buffer, 1.0f / det, buffer);
+    return buffer;
+}
