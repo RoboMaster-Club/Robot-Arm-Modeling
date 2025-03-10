@@ -1,15 +1,10 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "user_math.h"
 
 typedef struct {
-    float a;
-    float alpha;
-    float d;
-} dh_params_t;
-
-typedef struct {
-    dh_params_t dh_params;
+    DH_Params dh_params;
     float theta;
     float velocity;
     float x_pos;
