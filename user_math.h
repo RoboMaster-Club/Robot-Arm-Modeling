@@ -108,4 +108,3 @@ DH_Params* new_dh_params(float a, float alpha, float d, float theta);
 void free_dh_params(DH_Params* dh);
 Mat* dh_transform(DH_Params dh);
 Mat* dh_transform_buffer(DH_Params dh, Mat* buffer);
-
