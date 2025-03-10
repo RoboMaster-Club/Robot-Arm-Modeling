@@ -129,7 +129,7 @@ Mat* mat_mult(Mat* m1, Mat* m2) {
     return product;
 }
 
-void mat_mult_buffer(Mat* m1, Mat* m2, Mat* product) {
+Mat* mat_mult_buffer(Mat* m1, Mat* m2, Mat* product) {
     assert(m1->cols == m2->rows &&
               product->rows == m1->rows &&
               product->cols == m2->cols);
@@ -141,6 +141,8 @@ void mat_mult_buffer(Mat* m1, Mat* m2, Mat* product) {
             }
         }
     }
+
+    return product;
 }
 
 Mat* mat_scalar_mult(Mat* m, float scalar) {
@@ -155,13 +157,15 @@ Mat* mat_scalar_mult(Mat* m, float scalar) {
     return product;
 }
 
-void mat_scalar_mult_buffer(Mat* m, float scalar, Mat* product) {
+Mat* mat_scalar_mult_buffer(Mat* m, float scalar, Mat* product) {
     assert (product->rows == m->rows && product->cols == m->cols);
     for (int i = 0; i < m->rows; i++) {
         for (int j = 0; j < m->cols; j++) {
             MAT_IDX(product, i, j) = MAT_IDX(m, i, j) * scalar;
         }
     }
+
+    return product;
 }
 
 Mat* mat_add(Mat* m1, Mat* m2) {
@@ -177,13 +181,14 @@ Mat* mat_add(Mat* m1, Mat* m2) {
     return sum;
 }
 
-void mat_add_buffer(Mat* m1, Mat* m2, Mat* sum) {
+Mat* mat_add_buffer(Mat* m1, Mat* m2, Mat* sum) {
     assert(m1->rows == m2->rows && m1->cols == m2->cols && sum->rows == m1->rows && sum->cols == m1->cols);
     for (int i = 0; i < m1->rows; i++) {
         for (int j = 0; j < m1->cols; j++) {
             MAT_IDX(sum, i, j) = MAT_IDX(m1, i, j) + MAT_IDX(m2, i, j);
         }
     }
+    return sum;
 }
 
 Mat* mat_sub(Mat* m1, Mat* m2) {
@@ -200,13 +205,14 @@ Mat* mat_sub(Mat* m1, Mat* m2) {
 }
 
 
-void mat_sub_buffer(Mat* m1, Mat* m2, Mat* diff) {
+Mat* mat_sub_buffer(Mat* m1, Mat* m2, Mat* diff) {
     assert(m1->rows == m2->rows && m1->cols == m2->cols && diff->rows == m1->rows && diff->cols == m1->cols);
     for (int i = 0; i < m1->rows; i++) {
         for (int j = 0; j < m1->cols; j++) {
             MAT_IDX(diff, i, j) = MAT_IDX(m1, i, j) - MAT_IDX(m2, i, j);
         }
     }
+    return diff;
 }
 
 /*
@@ -395,3 +401,173 @@ Mat* mat_inverse_buffer(Mat* m, Mat* buffer) {
     mat_scalar_mult_buffer(buffer, 1.0f / det, buffer);
     return buffer;
 }
+
+/*
+-------------------------------------------------------------
+SECTION:	VECTOR CREATION FUNCTIONS
+-------------------------------------------------------------
+*/
+
+Vec* new_vec(int size) {
+    Vec* vec = new_mat(size, 1);
+    return vec;
+}
+
+Vec* new_vec_buffer(int size, float* buffer) {
+    Vec* vec = new_mat_buffer(size, 1, buffer);
+    return vec;
+}
+
+/*
+-------------------------------------------------------------
+SECTION:	VECTOR HELPERS
+-------------------------------------------------------------
+*/
+
+bool assert_vec(Vec* v) {
+    bool cond = (v->cols == 1 && v->rows > 0);
+    assert(cond);
+    return cond;
+}
+
+/*
+-------------------------------------------------------------
+SECTION:	VECTOR OPERATIONS
+-------------------------------------------------------------
+*/
+
+float vec_dot(Vec* v1, Vec* v2) {
+    assert(v1->rows == v2->rows);
+    assert_vec(v1);
+    assert_vec(v2);
+
+    float dot = 0.0f;
+    for (int i = 0; i < v1->rows; i++) {
+        dot += v1->data[i] * v2->data[i];
+    }
+    return dot;
+}
+
+Vec* vec_cross(Vec* v1, Vec* v2) {
+    assert(v1->rows == 3 && v2->rows == 3);
+    assert_vec(v1);
+    assert_vec(v2);
+
+    Vec* cross = new_vec(3);
+    cross->data[0] = v1->data[1] * v2->data[2] - v1->data[2] * v2->data[1];
+    cross->data[1] = v1->data[2] * v2->data[0] - v1->data[0] * v2->data[2];
+    cross->data[2] = v1->data[0] * v2->data[1] - v1->data[1] * v2->data[0];
+    return cross;
+}
+
+Vec* vec_cross_buffer(Vec* v1, Vec* v2, Vec* buffer) {
+    assert(v1->rows == 3 && v2->rows == 3 && buffer->rows == 3);
+    assert_vec(v1);
+    assert_vec(v2);
+    assert_vec(buffer);
+
+    buffer->data[0] = v1->data[1] * v2->data[2] - v1->data[2] * v2->data[1];
+    buffer->data[1] = v1->data[2] * v2->data[0] - v1->data[0] * v2->data[2];
+    buffer->data[2] = v1->data[0] * v2->data[1] - v1->data[1] * v2->data[0];
+    return buffer;
+}
+
+float vec_magnitude(Vec* v) {
+    assert_vec(v);
+    float mag = 0.0f;
+    for (int i = 0; i < v->rows; i++) {
+        mag += v->data[i] * v->data[i];
+    }
+    return sqrtf(mag);
+}
+
+Vec* vec_normalize(Vec* v) {
+    assert_vec(v);
+    Vec* normalized = new_vec(v->rows);
+    float mag = vec_magnitude(v);
+    for (int i = 0; i < v->rows; i++) {
+        normalized->data[i] = v->data[i] / mag;
+    }
+    return normalized;
+}
+
+Vec* vec_normalize_overwrite(Vec* v) {
+    assert_vec(v);
+    float mag = vec_magnitude(v);
+    for (int i = 0; i < v->rows; i++) {
+        v->data[i] /= mag;
+    }
+    return v;
+}
+
+/*
+-------------------------------------------------------------
+SECTION:	DH TRANSFORMATIONS
+-------------------------------------------------------------
+*/
+
+DH_Params* new_dh_params(float a, float alpha, float d, float theta) {
+    DH_Params* dh = (DH_Params*)malloc(sizeof(DH_Params));
+    dh->a = a;
+    dh->alpha = alpha;
+    dh->d = d;
+    dh->theta = theta;
+    return dh;
+}
+
+void free_dh_params(DH_Params* dh) {
+    free(dh);
+}
+
+Mat* dh_transform(DH_Params dh) {
+    Mat* transform = new_mat(4, 4);
+    // first row
+    MAT_IDX(transform, 0, 1) = cosf(dh.theta);
+    MAT_IDX(transform, 0, 2) = -1 * sinf(dh.theta) * cosf(dh.alpha);
+    MAT_IDX(transform, 0, 3) = sinf(dh.theta) * sinf(dh.alpha);
+    MAT_IDX(transform, 0, 4) =  dh.a * cosf(dh.theta);
+    // second row
+    MAT_IDX(transform, 1, 1) = sinf(dh.theta);
+    MAT_IDX(transform, 1, 2) = cosf(dh.theta) * cosf(dh.alpha);
+    MAT_IDX(transform, 1, 3) = cosf(dh.theta) * sinf(dh.alpha);
+    MAT_IDX(transform, 1, 4) =  dh.a * sinf(dh.theta);
+    // third row
+    MAT_IDX(transform, 2, 1) = 0;
+    MAT_IDX(transform, 2, 2) = sinf(dh.alpha);
+    MAT_IDX(transform, 2, 3) = cosf(dh.alpha);
+    MAT_IDX(transform, 2, 4) =  dh.d;
+    //fourth row
+    MAT_IDX(transform, 3, 1) = 0;
+    MAT_IDX(transform, 3, 2) = 0;
+    MAT_IDX(transform, 3, 3) = 0;
+    MAT_IDX(transform, 3, 4) = 1;
+
+    return transform;
+}
+
+Mat* dh_transform_buffer(DH_Params dh, Mat* buffer) {
+    assert(buffer->rows == 4 && buffer->cols == 4);
+    // first row
+    MAT_IDX(buffer, 0, 1) = cosf(dh.theta);
+    MAT_IDX(buffer, 0, 2) = -1 * sinf(dh.theta) * cosf(dh.alpha);
+    MAT_IDX(buffer, 0, 3) = sinf(dh.theta) * sinf(dh.alpha);
+    MAT_IDX(buffer, 0, 4) =  dh.a * cosf(dh.theta);
+    // second row
+    MAT_IDX(buffer, 1, 1) = sinf(dh.theta);
+    MAT_IDX(buffer, 1, 2) = cosf(dh.theta) * cosf(dh.alpha);
+    MAT_IDX(buffer, 1, 3) = cosf(dh.theta) * sinf(dh.alpha);
+    MAT_IDX(buffer, 1, 4) =  dh.a * sinf(dh.theta);
+    // third row
+    MAT_IDX(buffer, 2, 1) = 0;
+    MAT_IDX(buffer, 2, 2) = sinf(dh.alpha);
+    MAT_IDX(buffer, 2, 3) = cosf(dh.alpha);
+    MAT_IDX(buffer, 2, 4) =  dh.d;
+    //fourth row
+    MAT_IDX(buffer, 3, 1) = 0;
+    MAT_IDX(buffer, 3, 2) = 0;
+    MAT_IDX(buffer, 3, 3) = 0;
+    MAT_IDX(buffer, 3, 4) = 1;
+
+    return buffer;
+}
+
