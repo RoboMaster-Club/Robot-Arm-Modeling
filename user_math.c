@@ -279,6 +279,7 @@ Mat* mat_transpose_overwrite(Mat* m) {
 float mat_determinant(Mat* m) {
     assert (m->rows == m->cols);
     float det = 0.0f;
+    Mat* temp = NULL;
     switch (m->rows) {
         case 1:
             return m->data[0];
@@ -292,7 +293,7 @@ float mat_determinant(Mat* m) {
             return det;
         default:
             // submatrix for cofactor
-            Mat* temp = new_mat(m->rows-1, m->cols-1); 
+            temp = new_mat(m->rows-1, m->cols-1); 
             for (int j = 0; j < m->cols; j++) {
                 float sign = (j % 2 == 0) ? 1.0f : -1.0f;
                 
