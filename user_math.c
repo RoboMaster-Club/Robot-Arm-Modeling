@@ -63,7 +63,7 @@ char* mat_to_string(Mat* m) {
     snprintf(str, buffer_size, "Matrix %dx%d\n", m->rows, m->cols);
 
     // check largest and smallest -> see if need sci notation decision
-    float max_val = 0.0, min_val = __FLT_MAX__;
+    float max_val = 0.0, min_val = FLT_MAX; // __FLT_MAX__;
     for (int i = 0; i < m->rows * m->cols; i++) {
         if (fabsf(m->data[i]) > max_val) max_val = fabsf(m->data[i]);
         if (fabsf(m->data[i]) < min_val && m->data[i] != 0) min_val = fabsf(m->data[i]);
@@ -401,6 +401,33 @@ Mat* mat_inverse_buffer(Mat* m, Mat* buffer) {
     mat_transpose_overwrite(buffer);
     mat_scalar_mult_buffer(buffer, 1.0f / det, buffer);
     return buffer;
+}
+
+Mat* mat_pseudo_inverse(Mat *m) {
+    Mat* m_t = mat_transpose(m);
+    Mat* m_tm = mat_mult(m_t, m);
+    Mat* m_tm_inv = mat_inverse(m_tm);
+    Mat* m_p = mat_mult(m_tm_inv, m_t);
+    free_mat(m_t);
+    free_mat(m_tm);
+    free_mat(m_tm_inv);
+
+    return m_p;
+}
+
+Mat* mat_damped_pseudo_inverse(Mat* m, float rho) {
+    Mat* m_t = mat_transpose(m);
+    Mat* m_tm = mat_mult(m, m_t);
+    Mat* m_eye = new_eye(m_tm->rows);
+    mat_scalar_mult_buffer(m_eye, powf(rho, 2), m_eye);
+    mat_add_buffer(m_tm, m_eye, m_tm);
+    Mat* m_tm_inv = mat_inverse(m_tm);
+    Mat* m_p = mat_mult(m_t, m_tm_inv);
+    free_mat(m_t);
+    free_mat(m_tm);
+    free_mat(m_tm_inv);
+
+    return m_p;
 }
 
 /*

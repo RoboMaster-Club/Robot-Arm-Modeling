@@ -30,8 +30,10 @@ add_executable(robot_arm_modeling
 # Include header files
 target_include_directories(robot_arm_modeling PRIVATE ${CMAKE_SOURCE_DIR})
 
-# Include math library
-target_link_libraries(robot_arm_modeling m)
+# Include math library on linux
+if (UNIX) 
+    target_link_libraries(robot_arm_modeling m)
+endif (UNIX)
 
 # Enable testing support
 enable_testing()

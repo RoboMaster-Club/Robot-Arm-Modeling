@@ -4,7 +4,7 @@
         {
             "label": "Build",
             "type": "shell",
-            "command": "cmake -DENABLE_DEBUG=ON --build build",
+            "command": "cmake -DENABLE_DEBUG=OFF --build build",
             "problemMatcher": ["$gcc"],
             "group": {
                 "kind": "build",

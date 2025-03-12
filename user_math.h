@@ -3,6 +3,7 @@
 #include <math.h>
 #include <assert.h>
 #include <string.h>
+#include <float.h>
 
 // DEFINE CONSTANTS
 #define PI 3.14159265358979323846
@@ -60,6 +61,8 @@ Mat* mat_inverse_buffer(Mat* m, Mat* buffer);
 Mat* mat_transpose(Mat *m);
 Mat* mat_transpose_buffer(Mat *m, Mat* buffer);
 Mat* mat_transpose_overwrite(Mat *m);
+Mat* mat_pseudo_inverse(Mat *m);
+Mat* mat_damped_pseudo_inverse(Mat* m, float alpha, float rho);
 
 // TODO: ADD PSEUDO INVERSE
 
