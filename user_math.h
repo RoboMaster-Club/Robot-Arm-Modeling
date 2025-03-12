@@ -62,7 +62,7 @@ Mat* mat_transpose(Mat *m);
 Mat* mat_transpose_buffer(Mat *m, Mat* buffer);
 Mat* mat_transpose_overwrite(Mat *m);
 Mat* mat_pseudo_inverse(Mat *m);
-Mat* mat_damped_pseudo_inverse(Mat* m, float alpha, float rho);
+Mat* mat_damped_pseudo_inverse(Mat* m, float rho);
 
 // TODO: ADD PSEUDO INVERSE
 
