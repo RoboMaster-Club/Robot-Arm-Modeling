@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <string.h>
 #include <float.h>
+#include <stdarg.h>
+#include <ctype.h>
 
 // DEFINE CONSTANTS
 #define PI 3.14159265358979323846
@@ -14,6 +16,7 @@
 // MACROS
 #define MAT_IDX(m, i, j) ((m)->data[(i) * (m)->cols + (j)])
 #define VEC_IDX(m, i) ((m)->data[(i)])
+
 
 /*
 -------------------------------------------------------------
@@ -33,6 +36,9 @@ Mat* new_mat(int rows, int cols);
 Mat* new_eye(int size);
 Mat* new_mat_buffer(int rows, int cols, float* buffer);
 void free_mat(Mat* m);
+Mat* mat_copy(Mat* m);
+Mat* create_temp_mat(Mat* m);
+Mat* mat_execute_and_free(Mat* (*func)(void *, ...), ...);
 
 // matrix helpers
 char* mat_to_string(Mat* m);
