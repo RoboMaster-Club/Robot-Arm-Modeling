@@ -11,9 +11,24 @@ SECTION:	Matrix Creation Functions
 Mat *new_mat(int rows, int cols)
 {
     Mat *mat = (Mat *)malloc(sizeof(Mat));
+    
+    if (!mat)
+    {
+        perror("Failed to allocate memory for matrix");
+        exit(EXIT_FAILURE);
+    }
+
     mat->rows = rows;
     mat->cols = cols;
     mat->data = (float *)malloc(rows * cols * sizeof(float));
+
+    if (!mat->data)
+    {
+        perror("Failed to allocate memory for matrix data");
+        free(mat);
+        exit(EXIT_FAILURE);
+    }
+
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < cols; j++)
