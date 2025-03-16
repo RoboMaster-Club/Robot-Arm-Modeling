@@ -4,16 +4,14 @@
 #include "user_math.h"
 #include "arm_modeling.h"
 
-
-
-// [a, alpha, d]
+// [a, alpha, d, theta]
 Arm_State_t g_arm_state = { .joints[0].dh_params = {0, PI/2, 0.1, 0.0f},
-                            .joints[1].dh_params = {0.3, 0, 0, PI/2, 0.0f},
+                            .joints[1].dh_params = {0.3, 0, 0, PI/2},
                             .joints[2].dh_params = {0.3, 0, 0, 0},
                             .joints[3].dh_params = {0, PI/2, 0.1, 0.0f},
                             .joints[4].dh_params = {0, -1 * PI/2, 0.1, 0.0f},
                             .joints[5].dh_params = {0, 0, 0.1, 0.0f}
-}; // could be #defined somewhere these are all constants
+};
 
 //Denavit-Hartenberg matrix calculations
 Mat* joint_transform(joint_t joint) {
@@ -30,3 +28,9 @@ void forward_kinematics() {
         g_arm_state.joints[i].z_pos = MAT_IDX(transform, 2,3);   // index [2, 3]
     }
 } // can make it return final pos of arm and roll, pitch, yaw if needed
+
+void update_angles()
+
+void calculate_jacobian() {
+    
+}

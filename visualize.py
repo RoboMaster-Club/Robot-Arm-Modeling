@@ -4,6 +4,13 @@ from matplotlib.widgets import Slider
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 
+L1 = 0.3
+L2 = 0.3
+L2_vert_offset = 0.1
+L3_forward_offset = 0.1
+L3_horizontal_offset = 0.1
+
+
 # DH parameters (Denavit-Hartenberg)
 # [a, alpha, d, theta]
 def dh_params(theta1, theta2, theta3, theta4, theta5, theta6):
@@ -11,9 +18,9 @@ def dh_params(theta1, theta2, theta3, theta4, theta5, theta6):
     return np.array([
         [0, np.pi/2, 0.1, theta1],           # Joint 1 (base rotation)
         [0.3, 0, 0, theta2 + np.pi/2],       # Joint 2 (shoulder)
-        [0.3, 0, 0, theta3],                 # Joint 3 (elbow)
-        [0, np.pi/2, 0.1, theta4],           # Joint 4 (wrist 1)
-        [0, -np.pi/2, 0.1, theta5],          # Joint 5 (wrist 2)
+        [0.1, np.pi/2, 0, theta3 + np.pi/2],       # Joint 3 (elbow)
+        [0, -np.pi/2, 0.3 + 0.1, theta4],           # Joint 4 (wrist 1)
+        [0, np.pi/2, 0.1, theta5],          # Joint 5 (wrist 2)
         [0, 0, 0.1, theta6]                  # Joint 6 (wrist 3)
     ])
 
@@ -30,7 +37,7 @@ def dh_transform(a, alpha, d, theta):
 def forward_kinematics(dh_params):
     # Initialize with identity matrix
     T = np.identity(4)
-    transforms = []
+    transforms = [T.copy()]
     for i in range(len(dh_params)):
         a, alpha, d, theta = dh_params[i]
         T = T @ dh_transform(a, alpha, d, theta)
