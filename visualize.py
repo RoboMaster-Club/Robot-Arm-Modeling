@@ -14,14 +14,13 @@ L3_horizontal_offset = 0.1
 # DH parameters (Denavit-Hartenberg)
 # [a, alpha, d, theta]
 def dh_params(theta1, theta2, theta3, theta4, theta5, theta6):
-    # Adjust these parameters for your specific robot arm
     return np.array([
-        [0, np.pi/2, 0.1, theta1],           # Joint 1 (base rotation)
-        [0.3, 0, 0, theta2 + np.pi/2],       # Joint 2 (shoulder)
-        [0.1, np.pi/2, 0, theta3 + np.pi/2],       # Joint 3 (elbow)
-        [0, -np.pi/2, 0.3 + 0.1, theta4],           # Joint 4 (wrist 1)
-        [0, np.pi/2, 0.1, theta5],          # Joint 5 (wrist 2)
-        [0, 0, 0.1, theta6]                  # Joint 6 (wrist 3)
+        [0, np.pi/2, 0.1, theta1], # Joint 1 (base rotation)
+        [0.3, 0, 0, theta2 + np.pi/2], # Joint 2 (shoulder)
+        [0.1, np.pi/2, 0, -theta3 + np.pi/2], # Joint 3 (elbow)
+        [0, -np.pi/2, 0.3 + 0.1, theta4], # Joint 4 (wrist 1)
+        [0, -np.pi/2, 0, theta5], # Joint 5 (wrist 2)
+        [0, 0, 0.1, theta6] # Joint 6 (wrist 3)
     ])
 
 # Transformation matrix based on DH parameters
@@ -142,7 +141,6 @@ def update_plot(val=None):
 
     fig.canvas.draw_idle()
 
-# Connect sliders to update function
 slider1.on_changed(update_plot)
 slider2.on_changed(update_plot)
 slider3.on_changed(update_plot)
@@ -150,20 +148,5 @@ slider4.on_changed(update_plot)
 slider5.on_changed(update_plot)
 slider6.on_changed(update_plot)
 
-# Initial plot update
-
 plt.subplots_adjust(bottom=0.3)
 plt.show()
-
-# Alternative animation approach (uncomment to use)
-"""
-def animate(i):
-    # Example animation: rotate joint 1
-    slider1.set_val(np.sin(i/10) * np.pi)
-    return arm_points, end_effector
-
-ani = animation.FuncAnimation(fig, animate, frames=100, interval=50, blit=True)
-plt.tight_layout()
-plt.subplots_adjust(bottom=0.3)
-plt.show()
-"""

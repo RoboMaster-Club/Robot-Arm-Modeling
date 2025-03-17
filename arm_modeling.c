@@ -18,19 +18,14 @@ Mat* joint_transform(joint_t joint) {
     return dh_transform(joint.dh_params);
 }
 
-void forward_kinematics() {
+void forward_kinematics(Arm_State_t *arm_state) {
     dh_update_arm();
     Mat* transform = mat_identity(4);
     for (int i = 0; i < 6; i++) {
         transform = mat_mult(transform, joint_transform(g_arm_state.joints[i]));
-        g_arm_state.joints[i].x_pos = MAT_IDX(transform, 0,3);       // index [0, 3]
-        g_arm_state.joints[i].y_pos = MAT_IDX(transform, 1,3);   // index [1, 3]
-        g_arm_state.joints[i].z_pos = MAT_IDX(transform, 2,3);   // index [2, 3]
+        g_arm_state.joints[i].x_pos = MAT_IDX(transform, 0,3);
+        g_arm_state.joints[i].y_pos = MAT_IDX(transform, 1,3);
+        g_arm_state.joints[i].z_pos = MAT_IDX(transform, 2,3);
     }
-} // can make it return final pos of arm and roll, pitch, yaw if needed
-
-void update_angles()
-
-void calculate_jacobian() {
-    
 }
+
