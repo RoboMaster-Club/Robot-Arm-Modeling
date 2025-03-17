@@ -165,6 +165,9 @@ def decoupled_inverse_kinematics(theta, target_pos, target_rot, ax, max_iters=25
     wrist_center = get_wrist_center(target_pos, target_rot)
     
     for iter_count in range(max_iters):
+        if not running:
+            break
+
         # use Jacobian method for first 3 joints to reach wrist center
         J_pinv, current_wc = calculate_pos_jacobian_inv(theta, damping)
         
@@ -266,9 +269,17 @@ def decoupled_inverse_kinematics(theta, target_pos, target_rot, ax, max_iters=25
     
     return theta
 
+running = True
+
+def on_close(event):
+    global running
+    running = False  # Stop the loop when the window is closed
+
+
 plt.ion() 
 fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(111, projection='3d')
+fig.canvas.mpl_connect('close_event', on_close)
 
 theta = np.zeros(6)
 theta[1] = np.pi/2
@@ -278,7 +289,7 @@ target_rot = R.from_euler('xyz', [0, 90, 45], degrees=True).as_matrix()
 
 start = time.time()
 
-while True:
+while running:
     theta = decoupled_inverse_kinematics(theta, target_pos, target_rot, ax)
     
     # random target
