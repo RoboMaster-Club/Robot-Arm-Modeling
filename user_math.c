@@ -56,6 +56,85 @@ void free_mat(Mat *m)
     free(m);
 }
 
+Mat *mat_copy(Mat *m)
+{
+    Mat *copy = new_mat(m->rows, m->cols);
+    for (int i = 0; i < m->rows; i++)
+    {
+        for (int j = 0; j < m->cols; j++)
+        {
+            MAT_IDX(copy, i, j) = MAT_IDX(m, i, j);
+        }
+    }
+    return copy;
+}
+
+Mat* mat_submatrix(Mat* m1, int num_rows, int num_cols, int start_row, int start_col) {
+    assert(start_row >= 0 && start_col >= 0);
+    assert(start_row + num_rows <= m1->rows && start_col + num_cols <= m1->cols);
+    assert(num_rows > 0 && num_cols > 0);
+
+    Mat* submat = new_mat(num_rows, num_cols);
+    for (int i = 0; i < num_rows; i++) {
+        for (int j = 0; j < num_cols; j++) {
+            MAT_IDX(submat, i, j) = MAT_IDX(m1, start_row + i, start_col + j);
+        }
+    }
+
+    return submat;
+}
+
+Mat* mat_submatrix_buffer(Mat* m1, int start_row, int start_col, Mat* buffer) {
+    assert(start_row >= 0 && start_col >= 0);
+    assert(start_row + buffer->rows <= m1->rows && start_col + buffer->cols <= m1->cols);
+
+    for (int i = 0; i < buffer->rows; i++) {
+        for (int j = 0; j < buffer->cols; j++) {
+            MAT_IDX(buffer, i, j) = MAT_IDX(m1, start_row + i, start_col + j);
+        }
+    }
+
+    return buffer;
+}
+
+Mat* mat_concatenate(Mat* m1, Mat* m2, int axis) {
+    assert(axis == 0 || axis == 1);
+    assert(axis == 0 ? m1->cols == m2->cols : m1->rows == m2->rows);
+
+    Mat* concat = new_mat(m1->rows + (axis == 0 ? m2->rows : 0), m1->cols + (axis == 1 ? m2->cols : 0));
+    for (int i = 0; i < m1->rows; i++) {
+        for (int j = 0; j < m1->cols; j++) {
+            MAT_IDX(concat, i, j) = MAT_IDX(m1, i, j);
+        }
+    }
+    for (int i = 0; i < m2->rows; i++) {
+        for (int j = 0; j < m2->cols; j++) {
+            MAT_IDX(concat, i + (axis == 0 ? m1->rows : 0), j + (axis == 1 ? m1->cols : 0)) = MAT_IDX(m2, i, j);
+        }
+    }
+
+    return concat;
+}
+
+Mat* mat_concatenate_buffer(Mat* m1, Mat* m2, int axis, Mat* buffer) {
+    assert(axis == 0 || axis == 1);
+    assert(axis == 0 ? m1->cols == m2->cols : m1->rows == m2->rows);
+    assert(buffer->rows == m1->rows + (axis == 0 ? m2->rows : 0) && buffer->cols == m1->cols + (axis == 1 ? m2->cols : 0));
+
+    for (int i = 0; i < m1->rows; i++) {
+        for (int j = 0; j < m1->cols; j++) {
+            MAT_IDX(buffer, i, j) = MAT_IDX(m1, i, j);
+        }
+    }
+    for (int i = 0; i < m2->rows; i++) {
+        for (int j = 0; j < m2->cols; j++) {
+            MAT_IDX(buffer, i + (axis == 0 ? m1->rows : 0), j + (axis == 1 ? m1->cols : 0)) = MAT_IDX(m2, i, j);
+        }
+    }
+
+    return buffer;
+}
+
 /*
 -------------------------------------------------------------
 SECTION:	Matrix Helpers
@@ -514,6 +593,33 @@ Mat *mat_damped_pseudo_inverse(Mat *m, float rho)
     return m_p;
 }
 
+float mat_trace(Mat *m)
+{
+    assert(m->rows == m->cols);
+    float trace = 0.0f;
+    for (int i = 0; i < m->rows; i++)
+    {
+        trace += MAT_IDX(m, i, i);
+    }
+    return trace;
+}
+
+Mat* mat_clamp(Mat* val, float min, float max) {
+    Mat* clamped = new_mat(val->rows, val->cols);
+    for (int i = 0; i < val->rows * val->cols; i++) {
+        clamped->data[i] = clamp(val->data[i], min, max);
+    }
+    return clamped;
+}
+
+Mat* mat_clamp_buffer(Mat* val, float min, float max, Mat* buffer) {
+    assert(val->rows == buffer->rows && val->cols == buffer->cols);
+    for (int i = 0; i < val->rows * val->cols; i++) {
+        buffer->data[i] = clamp(val->data[i], min, max);
+    }
+    return buffer;
+}
+
 /*
 -------------------------------------------------------------
 SECTION:	VECTOR CREATION FUNCTIONS
@@ -698,4 +804,16 @@ Mat *dh_transform_buffer(DH_Params dh, Mat *buffer)
     MAT_IDX(buffer, 3, 4) = 1;
 
     return buffer;
+}
+
+/*
+-------------------------------------------------------------
+SECTION:	GENERAL OPERATIONS
+-------------------------------------------------------------
+*/
+
+float clamp(float val, float min, float max) {
+    if (val < min) return min;
+    if (val > max) return max;
+    return val;
 }

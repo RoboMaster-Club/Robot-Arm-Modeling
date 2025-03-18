@@ -33,6 +33,11 @@ Mat* new_mat(int rows, int cols);
 Mat* new_eye(int size);
 Mat* new_mat_buffer(int rows, int cols, float* buffer);
 void free_mat(Mat* m);
+Mat* mat_copy(Mat* m);
+Mat* mat_submatrix(Mat* m1, int num_rows, int num_cols, int start_row, int start_col);
+Mat* mat_submatrix_buffer(Mat* m1, int start_row, int start_col, Mat* buffer);
+Mat* mat_concatenate(Mat* m1, Mat* m2, int axis);
+Mat* mat_concatenate_buffer(Mat* m1, Mat* m2, int axis, Mat* buffer);
 
 // matrix helpers
 char* mat_to_string(Mat* m);
@@ -62,7 +67,10 @@ Mat* mat_transpose(Mat *m);
 Mat* mat_transpose_buffer(Mat *m, Mat* buffer);
 Mat* mat_transpose_overwrite(Mat *m);
 Mat* mat_pseudo_inverse(Mat *m);
-Mat* mat_damped_pseudo_inverse(Mat* m, float alpha, float rho);
+Mat* mat_damped_pseudo_inverse(Mat* m, float rho);
+float mat_trace(Mat *m);
+Mat* mat_clamp(Mat* val, float min, float max);
+Mat* mat_clamp_buffer(Mat* val, float min, float max, Mat* buffer);
 
 // TODO: ADD PSEUDO INVERSE
 
@@ -111,3 +119,13 @@ DH_Params* new_dh_params(float a, float alpha, float d, float theta);
 void free_dh_params(DH_Params* dh);
 Mat* dh_transform(DH_Params dh);
 Mat* dh_transform_buffer(DH_Params dh, Mat* buffer);
+
+
+/*
+-------------------------------------------------------------
+SECTION:	GENERAL OPERATIONS
+-------------------------------------------------------------
+*/
+
+float clamp(float val, float min, float max);
+
