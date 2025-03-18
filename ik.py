@@ -150,8 +150,10 @@ def calculate_pos_jacobian_inv(theta, damping=0.01):
 
 def solve_wrist_joints(R0_3, target_rot):
     # find rotation for joint 4 to 6
-    R4_6 = R0_3.T @ target_rot
+    R4_6 = - R0_3.T @ target_rot
+    # R4_6 = target_rot @ np.linalg.inv(R0_3)
     
+
     # get Euler angles from R3_6
     # our spherical wrist has roll-pitch-roll (ZY'Z'') convention
     theta4 = np.arctan2(R4_6[1, 2], R4_6[0, 2])
